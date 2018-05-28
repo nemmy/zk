@@ -1,0 +1,145 @@
+<?page title="Multilanguage ZK Application"?>
+<?link rel="stylesheet" type="text/css" href="/style.css"?>
+<?taglib uri="http://www.zkoss.org/dsp/web/core" prefix="c" ?>
+<zk>
+	<div sclass="row">
+		<div sclass="col-md-12">
+			<div sclass="panel panel-primary">
+				<div sclass="panel-heading">
+					<div sclass="panel-title">
+						${labels.userProfile}
+
+
+						<radiogroup style="float: right;" id="rg">
+							<attribute name="onCheck"><![CDATA[
+                String localeValue = self.getSelectedItem().getValue();
+                Locale prefer_locale = localeValue.length() > 2 ? 
+                        new Locale(localeValue.substring(0,2),localeValue.substring(3)) : new Locale(localeValue);
+                session.setAttribute(org.zkoss.web.Attributes.PREFERRED_LOCALE, prefer_locale);
+                session.setAttribute("Demo_Locale", self.getSelectedIndex());
+                execution.sendRedirect("");
+            ]]></attribute>
+            <hbox sclass="form-inline">
+                <radio label="English" value="en"
+                    checked="${c:getCurrentLocale() == self.value || c:getCurrentLocale() == 'en_US' || c:getCurrentLocale() == 'en_GB' }" />
+                <radio label="Français" value="fr"
+                    checked="${c:getCurrentLocale() == self.value || c:getCurrentLocale() == 'fr_FR' }" />
+                <radio label="Kinyarwanda" value="rw"
+                    checked="${c:getCurrentLocale() == self.value || c:getCurrentLocale() == 'rw_RW' }" />
+            </hbox>
+        </radiogroup>
+        
+        <zscript><![CDATA[
+            if (session.getAttribute("Demo_Locale") != null)
+                rg.setSelectedIndex(Integer.parseInt(session.getAttribute("Demo_Locale").toString()));
+        ]]></zscript>
+				
+				
+				
+				</div>
+			</div>
+			<div sclass="panel-body">
+				<div sclass="col-md-12">
+					<window
+						viewModel="@id('vm') @init('org.zkoss.essentials.chapter6.pagebased.ProfileViewModel')">
+						<vlayout>
+
+							<grid
+								form="@id('fx') @load(vm.currentUser) @save(vm.currentUser, before='save')">
+								<rows>
+									<row sclass="form-group">
+										<cell
+											sclass="control-label col-md-2">
+											${labels.account}
+										</cell>
+										<cell>
+											<label
+												value="@load(fx.account)" sclass="col-md-10" />
+										</cell>
+									</row>
+									<row sclass="form-group">
+										<cell sclass="control-label">
+											${labels.fullName}
+										</cell>
+										<cell>
+											<textbox
+												value="@bind(fx.fullName)" sclass="form-control"
+												constraint="no empty: Plean enter your full name" />
+										</cell>
+									</row>
+									<row sclass="form-group">
+										<cell
+											sclass="control-label col-md-4">
+											${labels.email}
+										</cell>
+										<cell>
+											<textbox
+												value="@bind(fx.email)" sclass="form-control col-md-8"
+												constraint="/.+@.+\.[a-z]+/: Please enter an e-mail address" />
+										</cell>
+									</row>
+									<row sclass="form-group">
+										<cell
+											sclass="control-label col-md-4">
+											${labels.birthday}
+										</cell>
+										<cell sclass="col-md-8">
+											<datebox
+												value="@bind(fx.birthday)" constraint="no future" />
+										</cell>
+									</row>
+									<row sclass="form-group">
+										<cell
+											sclass="control-label col-md-4">
+											${labels.country}
+										</cell>
+										<cell>
+											<listbox
+												model="@load(vm.countryList)" sclass="form-control col-md-8"
+												mold="select" selectedItem="@bind(fx.country)">
+												<template
+													name="model">
+													<listitem
+														label="@load(each)" />
+												</template>
+											</listbox>
+										</cell>
+									</row>
+									<row sclass="form-group">
+										<cell sclass="control-label">
+											${labels.bio}
+										</cell>
+										<cell>
+											<textbox
+												value="@bind(fx.bio)" multiline="true" sclass="form-control"
+												hflex="1" height="100px" />
+										</cell>
+									</row>
+								</rows>
+							</grid>
+
+							<div sclass="row">
+								<div sclass="col-sm-12">
+									${labels.editingProfileOf}
+									<label sclass="label label-primary"
+										value="@load(vm.currentUser.fullName)" />
+									.
+								</div>
+							</div>
+							<div sclass="row">
+								<div sclass="col-sm-12">
+									<button onClick="@command('save')"
+										sclass="btn btn-primary pull-left" label="${labels.save}" />
+									<button onClick="@command('reload')"
+										sclass="btn btn-default pull-right" label="${labels.reload}" />
+								</div>
+							</div>
+						</vlayout>
+					</window>
+
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+</zk>
